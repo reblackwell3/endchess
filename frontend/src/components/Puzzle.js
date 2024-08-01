@@ -1,6 +1,7 @@
 // src/components/Puzzle.js
 import React, { useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import './Puzzle.css';
 import axios from 'axios';
 
 const Puzzle = () => {
@@ -35,8 +36,10 @@ const Puzzle = () => {
   };
 
   return (
-    <div>
-      <Chessboard position={position} />
+    <div className="puzzle-container">
+      <div className="chessboard-container">
+        <Chessboard position={position} />
+      </div>
       <button onClick={handleShowNextMove}>Show Next Move</button>
     </div>
   );
