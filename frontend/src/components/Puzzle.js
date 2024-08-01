@@ -15,6 +15,8 @@ const Puzzle = () => {
       try {
         const response = await axios.get('http://localhost:5000/api/puzzles/random');
         const { FEN, Moves } = response.data;
+        console.log(FEN);
+        console.log(Moves);
         const newChess = new Chess(FEN);
         setChess(newChess);
         setPosition(FEN);
@@ -27,21 +29,42 @@ const Puzzle = () => {
     fetchPuzzle();
   }, []);
 
-  const handleShowNextMove = () => {
-    if (currentMoveIndex < solution.length) {
-      const move = solution[currentMoveIndex];
-      chess.move(move);
-      setPosition(chess.fen());
-      setCurrentMoveIndex(currentMoveIndex + 1);
-    }
+  const showNextMove = () => {
+    setCurrentMoveIndex((prevIndex) => {
+      if (prevIndex < solution.length) {
+        const move = solution[prevIndex];
+        chess.move(move);
+        setPosition(chess.fen());
+        return prevIndex + 1;
+      } else {
+        return prevIndex;
+      }
+    });
   };
+
+  useEffect(() => {
+    const startSolution = () => {
+      const intervalId = setInterval(() => {
+        showNextMove();
+        if (currentMoveIndex >= solution.length) {
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    };
+
+    const timerId = setTimeout(startSolution, 3000);
+
+    return () => {
+      clearTimeout(timerId);
+      clearInterval(startSolution);
+    };
+  }, [solution, chess, currentMoveIndex]);
 
   return (
     <div className="puzzle-container">
       <div className="chessboard-container">
         <Chessboard position={position} />
       </div>
-      <button onClick={handleShowNextMove}>Show Next Move</button>
     </div>
   );
 };
