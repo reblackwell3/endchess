@@ -1,19 +1,22 @@
-// src/components/Puzzle.js
 import React, { useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import './Puzzle.css';
 import axios from 'axios';
+import { Chess } from 'chess.js';
+import './Puzzle.css';
 
 const Puzzle = () => {
   const [position, setPosition] = useState('');
   const [solution, setSolution] = useState([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(0);
+  const [chess, setChess] = useState(new Chess());
 
   useEffect(() => {
     const fetchPuzzle = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/puzzles/random');
         const { FEN, Moves } = response.data;
+        const newChess = new Chess(FEN);
+        setChess(newChess);
         setPosition(FEN);
         setSolution(Moves.split(' '));
       } catch (error) {
@@ -27,10 +30,8 @@ const Puzzle = () => {
   const handleShowNextMove = () => {
     if (currentMoveIndex < solution.length) {
       const move = solution[currentMoveIndex];
-      setPosition((prevPosition) => {
-        const [from, to] = move.split('-');
-        return prevPosition.replace(from, to);
-      });
+      chess.move(move);
+      setPosition(chess.fen());
       setCurrentMoveIndex(currentMoveIndex + 1);
     }
   };
