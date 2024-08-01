@@ -10,8 +10,6 @@ dotenv.config({ path: '.env.test' });
 const app = express();
 app.use(express.json());
 
-let connection;
-
 before(async () => {
     await connectDB();
     app.use('/api/players', playerRoutes);

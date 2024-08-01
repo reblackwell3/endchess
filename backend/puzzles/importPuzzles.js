@@ -3,21 +3,13 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const csv = require('csv-parser');
 const Puzzle = require('./puzzleModel');
+const connectDB = require('../config/db')
 
 // Load environment variables from .env file
 require('dotenv').config();
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI);
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-  importPuzzles();
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error(`Error connecting to MongoDB: ${err.message}`);
-});
+connectDB();
+importPuzzles();
 
 async function importPuzzles() {
   try {
@@ -44,13 +36,12 @@ async function importPuzzles() {
 
         // Save puzzle to database
         await puzzle.save();
+
       })
       .on('end', () => {
         console.log('CSV file successfully processed and data imported');
-        mongoose.connection.close();
       });
   } catch (err) {
     console.error(`Error importing puzzles: ${err.message}`);
-    mongoose.connection.close();
   }
 }
