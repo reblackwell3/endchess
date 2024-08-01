@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const puzzleRoutes = require('./puzzles/puzzleRoutes');
 const playerRoutes = require('./players/playerRoutes');
 
-dotenv.config();
+dotenv.config({ path: '.env' });
 
 const app = express();
 

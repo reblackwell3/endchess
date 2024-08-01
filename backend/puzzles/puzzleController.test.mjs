@@ -13,7 +13,7 @@ app.use(express.json());
 let connection;
 
 before(async () => {
-    connection = await connectDB();
+    await connectDB();
     app.use('/api/puzzles', puzzleRoutes);
 });
 
