@@ -1,5 +1,6 @@
 // backend/server.js
 const express = require('express');
+const cors = require('cors');
 const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const puzzleRoutes = require('./puzzles/puzzleRoutes');
@@ -8,6 +9,7 @@ const playerRoutes = require('./players/playerRoutes');
 dotenv.config({ path: '.env' });
 
 const app = express();
+app.use(cors())
 
 // Connect to database
 connectDB();
