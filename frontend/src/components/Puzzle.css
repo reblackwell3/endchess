@@ -1,0 +1,36 @@
+/* Container for the Puzzle component */
+.puzzle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 90%;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+/* Chessboard styling to make it responsive */
+.chessboard-container {
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 1; /* Ensures the chessboard is always square */
+  margin: auto;
+}
+
+/* Button styling */
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #61dafb;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}

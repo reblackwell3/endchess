@@ -1,15 +1,13 @@
-// src/App.js
 import React from 'react';
 import './App.css';
-import Puzzle from './components/Puzzle';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes'; // Import the AppRoutes component
 
 const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Puzzle />
-      </header>
-    </div>
+    <Router>
+      <AppRoutes /> {/* Render the AppRoutes component */}
+    </Router>
   );
 };
 
