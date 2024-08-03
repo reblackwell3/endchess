@@ -5,23 +5,22 @@ const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const puzzleRoutes = require('./puzzles/puzzleRoutes');
 const playerRoutes = require('./players/playerRoutes');
+const gameRoutes = require('./games/gameRoutes');
 
 dotenv.config({ path: '.env' });
 
 const app = express();
 app.use(cors())
 
-// Connect to database
 connectDB();
 
-// Middleware to parse JSON
 app.use(express.json());
 
-// Use puzzle routes
 app.use('/api/puzzles', puzzleRoutes);
 
-// Use player routes
 app.use('/api/players', playerRoutes);
+
+app.use('/api/games', gameRoutes);
 
 const PORT = process.env.PORT || 5000;
 
