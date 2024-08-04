@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { parsePgn } = require('./parsePgn');
 const Game = require('./gameModel');
-const { Chess } = require('chess.js');
 const connectDB = require('../config/db');
 
 // Load environment variables from .env file
@@ -20,29 +19,28 @@ if (!fileName) {
 
 // Call importGames with the provided filename
 importGames(fileName);
-  
+
 async function importGames(fileName) {
   try {
-    await Game.deleteMany({}); // todo will have to remove this and figure out how to dedup
+    await Game.deleteMany({});
     console.log('Cleared existing game data');
-    const parsedPgns = await parsePgn(`./data/${fileName}.pgn`); // Use template literal here
+    const parsedPgns = await parsePgn(`./data/${fileName}.pgn`);
     const games = parsedPgns.map(parsedPgn => buildGame(parsedPgn)).filter(game => game !== null);
-    console.log(games.length + ' games have been built');
-    await Promise.all(games.map(game => game.save())); // Ensure that all games are saved
+    console.log(`${games.length} games have been built`);
+    await Promise.all(games.map(game => game.save()));
     console.log('PGN file successfully processed and data imported');
   } catch (err) {
     console.error(`Error importing games: ${err.message}`);
   } finally {
-    mongoose.connection.close(); // Close the connection after import
+    mongoose.connection.close();
+    console.log('Connection closed');
   }
 }
 
-function buildGame(pgn) {
+function buildGame(parsedPgn) {
   try {
-    const chess = new Chess();
-    const pgnText = pgn.join('\n');
-    chess.loadPgn(pgnText);
-    const headers = chess.header();
+    const headers = parsedPgn.headers;
+
     return new Game({
       GameId: `game_${headers.White}_${headers.Black}_${headers.UTCDate}`,
       WhitePlayer: headers.White || '',
@@ -50,8 +48,8 @@ function buildGame(pgn) {
       Result: headers.Result || '',
       Date: headers.UTCDate || '',
       Opening: headers.Opening || '',
-      Moves: chess.moves(),
-      PGN: pgnText,
+      Moves: parsedPgn.moves.map(move => move.move).join(' '),
+      PGN: parsedPgn.raw || '',
       WhiteElo: headers.WhiteElo || '',
       BlackElo: headers.BlackElo || '',
       WhiteRatingDiff: headers.WhiteRatingDiff || '',
@@ -61,7 +59,9 @@ function buildGame(pgn) {
       Termination: headers.Termination || ''
     });
   } catch (error) {
-    console.error('Failed to load PGN:', error);
+    console.error('Failed to build game:', error);
   }
   return null;
 }
+
+module.exports = { importGames, buildGame };
