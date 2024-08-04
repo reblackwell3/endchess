@@ -1,15 +1,21 @@
-// backend/games/gameModel.js
 const mongoose = require('mongoose');
 
 const gameSchema = new mongoose.Schema({
-  GameId: String,
-  WhitePlayer: String,
-  BlackPlayer: String,
-  Result: String,
-  Date: String,
-  Opening: String,
-  Moves: String,
-  PGN: String,
+  GameId: { type: String, required: true },
+  WhitePlayer: { type: String, required: true },
+  BlackPlayer: { type: String, required: true },
+  Result: { type: String, required: true },
+  Date: { type: String, required: true },
+  Opening: { type: String, required: false },
+  Moves: { type: String, required: true },
+  PGN: { type: String, required: true },
+  WhiteElo: { type: String, required: false },
+  BlackElo: { type: String, required: false },
+  WhiteRatingDiff: { type: String, required: false },
+  BlackRatingDiff: { type: String, required: false },
+  ECO: { type: String, required: false },
+  TimeControl: { type: String, required: false },
+  Termination: { type: String, required: false }
 });
 
 const Game = mongoose.model('Game', gameSchema);
