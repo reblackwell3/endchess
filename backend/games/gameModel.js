@@ -7,7 +7,7 @@ const gameSchema = new mongoose.Schema({
   Result: { type: String, required: true },
   Date: { type: String, required: true },
   Opening: { type: String, required: false },
-  Moves: { type: String, required: true },
+  Moves: { type: Array, required: true },
   PGN: { type: String, required: true },
   WhiteElo: { type: String, required: false },
   BlackElo: { type: String, required: false },
