@@ -42,13 +42,4 @@ describe('Import Games', () => {
       throw err; // Re-throw the error to ensure the test fails
     }
   });
-
-  after(async () => {
-    try {
-      await mongoose.connection.close();
-      console.log('Connection closed');
-    } catch (err) {
-      console.error('Error in after hook:', err.message);
-    }
-  });
 });
