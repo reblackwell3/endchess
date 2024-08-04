@@ -29,9 +29,6 @@ async function importGames(path) {
     console.log('PGN file successfully processed and data imported');
   } catch (err) {
     console.error(`Error importing games: ${err.message}`);
-  } finally {
-    mongoose.connection.close();
-    console.log('Connection closed');
   }
 }
 

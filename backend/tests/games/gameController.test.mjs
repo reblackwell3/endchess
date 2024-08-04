@@ -20,5 +20,6 @@ describe('Games Controller', () => {
     it('should get random game', async () => {
         const res = await request(app).get('/api/games/random');
         expect(res.status).to.equal(200);
+        expect(res.body).to.not.equal(null);
     });
 });
