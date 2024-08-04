@@ -1,15 +1,15 @@
-// tests/readPgn.test.mjs
 import { expect } from 'chai';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { readPgn } from './readPgn.js';  // Adjust the path as needed
+import { readPgn } from '../../games/readPgn.js';  // Adjust the path as needed
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 describe('readPgn', () => {
   it('should parse a PGN file with multiple games correctly', async () => {
-    const games = await readPgn('./test_data/two-games.pgn');
+    const pgnPath = path.resolve(__dirname, '../data/two-games.pgn');
+    const games = await readPgn(pgnPath);
 
     expect(games).to.have.lengthOf(2);
 
