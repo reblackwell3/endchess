@@ -18,8 +18,14 @@ function parsePgn(filePath) {
 
     rl.on('close', () => {
       try {
-        const parsedGames = pgnParser.parse(pgnData);
-        resolve(parsedGames);
+        const parsedPgns = pgnParser.parse(pgnData).map(parsedPgn => {
+          const headers = parsedPgn.headers.reduce((acc, header) => {
+            acc[header.name] = header.value;
+            return acc;
+          }, {});
+          return { ...parsedPgn, headers, raw: pgnData };
+        });
+        resolve(parsedPgns);
       } catch (error) {
         reject(error);
       }

@@ -25,8 +25,8 @@ async function importGames(fileName) {
   try {
     await Game.deleteMany({}); // todo will have to remove this and figure out how to dedup
     console.log('Cleared existing game data');
-    const pgns = await parsePgn(`./data/${fileName}.pgn`); // Use template literal here
-    const games = pgns.map(pgn => buildGame(pgn)).filter(game => game !== null);
+    const parsedPgns = await parsePgn(`./data/${fileName}.pgn`); // Use template literal here
+    const games = parsedPgns.map(parsedPgn => buildGame(parsedPgn)).filter(game => game !== null);
     console.log(games.length + ' games have been built');
     await Promise.all(games.map(game => game.save())); // Ensure that all games are saved
     console.log('PGN file successfully processed and data imported');
