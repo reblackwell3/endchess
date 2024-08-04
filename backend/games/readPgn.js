@@ -1,9 +1,17 @@
-// readPgn.js
 const fs = require('fs');
 const readline = require('readline');
 const { Chess } = require('chess.js');
+const Game = require('./gameModel'); // Adjust the path as needed
 
-function parsePgnFile(filePath) {
+async function readPgn(filePath) {
+  const pgnTexts = await parsePgn(filePath);
+  console.log(pgnTexts);
+  const games = pgnTexts.map(pgnText => buildGame(pgnText)).filter(game => game !== null);
+  console.log(games);
+  return games;
+}
+
+function parsePgn(filePath) {
   return new Promise((resolve, reject) => {
     const fileStream = fs.createReadStream(filePath);
     const rl = readline.createInterface({
@@ -11,29 +19,28 @@ function parsePgnFile(filePath) {
       crlfDelay: Infinity
     });
 
-    let gameData = '';
-    let games = [];
-    let inGame = false;
+    const pgnTexts = [];
+    let pgnText = '';
+    let endOfHeaders = false;
 
     rl.on('line', (line) => {
       if (line.startsWith('[')) {
-        if (inGame && gameData) {
-          games.push(gameData.trim());
-          gameData = '';
+        if (endOfHeaders) {
+          pgnTexts.push(pgnText.trim());
+          pgnText = '';
+          endOfHeaders = false;
         }
-        inGame = true;
+      } else {
+        endOfHeaders = true;
       }
-
-      if (inGame) {
-        gameData += line + '\n';
-      }
+      pgnText += line + '\n';
     });
 
     rl.on('close', () => {
-      if (gameData) {
-        games.push(gameData.trim());
+      if (pgnText) {
+        pgnTexts.push(pgnText.trim());
       }
-      resolve(games);
+      resolve(pgnTexts);
     });
 
     rl.on('error', (error) => {
@@ -42,22 +49,30 @@ function parsePgnFile(filePath) {
   });
 }
 
-async function readPgn(filePath) {
-  const games = await parsePgnFile(filePath);
+function buildGame(pgnText) {
   const chess = new Chess();
-  const parsedGames = [];
-
-  games.forEach((game) => {
-    if (chess.loadPgn(game)) {
-      parsedGames.push({
-        headers: chess.header(),
-        moves: chess.history(),
-        pgn: game
-      });
-    }
-  });
-
-  return parsedGames;
+  if (chess.loadPgn(pgnText)) {
+    console.log('loaded' + pgnText);
+    const headers = chess.header();
+    return new Game({
+      GameId: `game_${headers.White}_${headers.Black}_${headers.UTCDate}`,
+      WhitePlayer: headers.White || '',
+      BlackPlayer: headers.Black || '',
+      Result: headers.Result || '',
+      Date: headers.UTCDate || '',
+      Opening: headers.Opening || '',
+      Moves: chess.history().join(' '),
+      PGN: pgnText,
+      WhiteElo: headers.WhiteElo || '',
+      BlackElo: headers.BlackElo || '',
+      WhiteRatingDiff: headers.WhiteRatingDiff || '',
+      BlackRatingDiff: headers.BlackRatingDiff || '',
+      ECO: headers.ECO || '',
+      TimeControl: headers.TimeControl || '',
+      Termination: headers.Termination || ''
+    });
+  }
+  return null;
 }
 
 module.exports = { readPgn };
