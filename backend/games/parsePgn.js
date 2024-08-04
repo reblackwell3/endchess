@@ -10,22 +10,30 @@ function parsePgn(filePath) {
       crlfDelay: Infinity
     });
 
-    let pgnData = '';
+    let currentPgn = [];
+    let endOfHeaders = false;
+    const pgns = [];
 
     rl.on('line', (line) => {
-      pgnData += line + '\n';
+      if (line.startsWith('[')) {
+        if (endOfHeaders) {
+          pgns.push(currentPgn.join('\n').trim());
+          currentPgn = [];
+          endOfHeaders = false;
+        }
+      } else {
+        endOfHeaders = true;
+      }
+      currentPgn.push(line);
     });
 
     rl.on('close', () => {
+
+      handleLastPgn(pgns, currentPgn);
+
       try {
-        const parsedPgns = pgnParser.parse(pgnData).map(parsedPgn => {
-          const headers = parsedPgn.headers.reduce((acc, header) => {
-            acc[header.name] = header.value;
-            return acc;
-          }, {});
-          return { ...parsedPgn, headers, raw: pgnData };
-        });
-        resolve(parsedPgns);
+        const parsedPgns = pgns.map(pgn => augmentParsed(pgnParser.parse(pgn), pgn));
+        resolve(parsedPgns.filter(pgn => pgn !== null));
       } catch (error) {
         reject(error);
       }
@@ -35,6 +43,33 @@ function parsePgn(filePath) {
       reject(error);
     });
   });
+}
+
+function handleLastPgn(pgns, currentPgn) {
+  if (currentPgn.length > 0) {
+    const currentPgnText = currentPgn.join('\n').trim();
+    try {
+      pgnParser.parse(currentPgnText);
+      pgns.push(currentPgnText)
+    } catch {
+      console.log('Dropping last partial pgn = ' + currentPgnText);
+    }
+  }
+}
+
+function augmentParsed(parsed, raw) {
+  if (parsed.length > 0) {
+    const headers = buildHeaders(parsed[0].headers);
+    return { ...parsed[0], headers, raw };
+  }
+  return null;
+}
+
+function buildHeaders(headersArray) {
+  return headersArray.reduce((acc, header) => {
+    acc[header.name] = header.value;
+    return acc;
+  }, {});
 }
 
 module.exports = { parsePgn };
