@@ -1,5 +1,6 @@
 const fs = require('fs');
 const readline = require('readline');
+const pgnParser = require('pgn-parser');
 
 function parsePgn(filePath) {
   return new Promise((resolve, reject) => {
@@ -9,28 +10,19 @@ function parsePgn(filePath) {
       crlfDelay: Infinity
     });
 
-    const pgns = [];
-    let pgn = [];
-    let endOfHeaders = false;
+    let pgnData = '';
 
     rl.on('line', (line) => {
-      if (line.startsWith('[')) {
-        if (endOfHeaders) {
-          pgns.push(pgn);
-          pgn = [];
-          endOfHeaders = false;
-        }
-      } else {
-        endOfHeaders = true;
-      }
-      pgn.push(line);
+      pgnData += line + '\n';
     });
 
     rl.on('close', () => {
-      if (pgn.length > 0) {
-        pgns.push(pgn);
+      try {
+        const parsedGames = pgnParser.parse(pgnData);
+        resolve(parsedGames);
+      } catch (error) {
+        reject(error);
       }
-      resolve(pgns);
     });
 
     rl.on('error', (error) => {
