@@ -11,7 +11,7 @@ describe('parsePgn', () => {
     const pgnPath = path.resolve(__dirname, '../data/two-games.pgn');
     const parsedPgns = await parsePgn(pgnPath);
 
-    console.log('Parsed PGN Data:', JSON.stringify(parsedPgns, null, 2));
+//    console.log('Parsed PGN Data:', JSON.stringify(parsedPgns, null, 2));
 
     expect(parsedPgns).to.have.lengthOf(2);
 

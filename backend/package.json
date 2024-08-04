@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "mocha '**/*.test.mjs'",
+    "test": "mocha 'tests/**/*.test.mjs'",
     "start": "node server.js"
   },
   "keywords": [],

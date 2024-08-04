@@ -10,21 +10,19 @@ require('dotenv').config();
 connectDB();
 
 // Get the filename from the command line arguments
-const fileName = process.argv[2];
+const path = process.argv[2];
 
-if (!fileName) {
+if (!path) {
   console.error('Please provide a file name as an argument');
   process.exit(1);
 }
 
-// Call importGames with the provided filename
-importGames(fileName);
+// Call importGames with the provided path
+importGames(path);
 
-async function importGames(fileName) {
+async function importGames(path) {
   try {
-    await Game.deleteMany({});
-    console.log('Cleared existing game data');
-    const parsedPgns = await parsePgn(`./data/${fileName}.pgn`);
+    const parsedPgns = await parsePgn(path);
     const games = parsedPgns.map(parsedPgn => buildGame(parsedPgn)).filter(game => game !== null);
     console.log(`${games.length} games have been built`);
     await Promise.all(games.map(game => game.save()));
