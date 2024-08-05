@@ -17,8 +17,14 @@ if (!path) {
   process.exit(1);
 }
 
+console.log('Beginning import of ' + path);
+
 // Call importGames with the provided path
-importGames(path);
+(async () => {
+  await connectDB();
+  await importGames(path);
+  mongoose.connection.close();
+})();
 
 async function importGames(path) {
   try {

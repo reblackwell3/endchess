@@ -10,9 +10,9 @@ function parsePgn(filePath) {
       crlfDelay: Infinity
     });
 
+    var pgns = [];
     let currentPgn = [];
     let endOfHeaders = false;
-    const pgns = [];
 
     rl.on('line', (line) => {
       if (line.startsWith('[')) {
@@ -28,15 +28,10 @@ function parsePgn(filePath) {
     });
 
     rl.on('close', () => {
-
-      handleLastPgn(pgns, currentPgn);
-
-      try {
-        const parsedPgns = pgns.map(pgn => augmentParsed(pgnParser.parse(pgn), pgn));
-        resolve(parsedPgns.filter(pgn => pgn !== null));
-      } catch (error) {
-        reject(error);
-      }
+      pgns.push(currentPgn.join('\n').trim());
+      pgns = pgns.filter(pgn => isValidPgn(pgn));
+      const parsedPgns = pgns.map(pgn => augmentParsed(pgnParser.parse(pgn), pgn));
+      resolve(parsedPgns);
     });
 
     rl.on('error', (error) => {
@@ -45,31 +40,26 @@ function parsePgn(filePath) {
   });
 }
 
-function handleLastPgn(pgns, currentPgn) {
-  if (currentPgn.length > 0) {
-    const currentPgnText = currentPgn.join('\n').trim();
-    try {
-      pgnParser.parse(currentPgnText);
-      pgns.push(currentPgnText)
-    } catch {
-      console.log('Dropping last partial pgn = ' + currentPgnText);
+function isValidPgn(pgn) {
+  try {
+    var parsed = pgnParser.parse(pgn);
+    parsed = augmentParsed(parsed);
+    if (parsed.headers.White != null) {
+      return true;
     }
+  } catch (error) {
+    console.log('Pgn parsing error');
   }
+  console.log('Invalid pgn ' + pgn);
+  return false;
 }
 
-function augmentParsed(parsed, raw) {
-  if (parsed.length > 0) {
-    const headers = buildHeaders(parsed[0].headers);
-    return { ...parsed[0], headers, raw };
-  }
-  return null;
-}
-
-function buildHeaders(headersArray) {
-  return headersArray.reduce((acc, header) => {
+function augmentParsed(parsed, rawPgn) {
+  const headers = parsed[0].headers.reduce((acc, header) => {
     acc[header.name] = header.value;
     return acc;
   }, {});
+  return { ...parsed[0], headers, raw: rawPgn };
 }
 
 module.exports = { parsePgn };
