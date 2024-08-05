@@ -15,10 +15,11 @@ const Player = ({ positionNum, incrementPositionNum, positionUrl }) => {
     try {
       console.log('fetching url '+ positionUrl);
       const response = await axios.get(positionUrl);
+      // console.log(JSON.stringify(response, null, 2));
       const { FEN, Moves } = response.data;
       console.log('Fetched FEN:', FEN);
       console.log('Fetched Moves:', Moves);
-      const newChess = FEN != null ? new Chess(FEN) : new Chess();
+      const newChess = FEN ? new Chess(FEN) : new Chess();
       setChess(newChess);
       setPosition(FEN);
       setSolution(Moves.split(' '));

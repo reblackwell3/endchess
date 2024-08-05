@@ -6,16 +6,16 @@ const gameSchema = new mongoose.Schema({
   BlackPlayer: { type: String, required: true },
   Result: { type: String, required: true },
   Date: { type: String, required: true },
-  Opening: { type: String, required: false },
+  Opening: { type: String },
   Moves: { type: String, required: true },
   PGN: { type: String, required: true },
-  WhiteElo: { type: String, required: false },
-  BlackElo: { type: String, required: false },
-  WhiteRatingDiff: { type: String, required: false },
-  BlackRatingDiff: { type: String, required: false },
-  ECO: { type: String, required: false },
-  TimeControl: { type: String, required: false },
-  Termination: { type: String, required: false }
+  WhiteElo: { type: String },
+  BlackElo: { type: String },
+  WhiteRatingDiff: { type: String },
+  BlackRatingDiff: { type: String },
+  ECO: { type: String },
+  TimeControl: { type: String },
+  Termination: { type: String }
 });
 
 const Game = mongoose.model('Game', gameSchema);
