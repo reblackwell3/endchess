@@ -2,28 +2,29 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import axios from 'axios';
 import { Chess } from 'chess.js';
-import './Puzzle.css';
+import './Player.css';
 
-const Puzzle = ({ puzzleNum, incrementPuzzleNum }) => {
+const Player = ({ positionNum, incrementPositionNum, positionUrl }) => {
   const [position, setPosition] = useState('');
   const [solution, setSolution] = useState([]);
   const [chess, setChess] = useState(new Chess());
   const intervalIdRef = useRef(null);
   const moveIndexRef = useRef(0);
 
-  const fetchPuzzle = async () => {
+  const fetchPosition = async (positionUrl) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/puzzles/random');
+      console.log('fetching url '+ positionUrl);
+      const response = await axios.get(positionUrl);
       const { FEN, Moves } = response.data;
       console.log('Fetched FEN:', FEN);
       console.log('Fetched Moves:', Moves);
-      const newChess = new Chess(FEN);
+      const newChess = FEN != null ? new Chess(FEN) : new Chess();
       setChess(newChess);
       setPosition(FEN);
       setSolution(Moves.split(' '));
       moveIndexRef.current = 0; // Reset move index for the new puzzle
     } catch (error) {
-      console.error('Error fetching puzzle:', error);
+      console.error('Error fetching position:', error);
     }
   };
 
@@ -35,15 +36,15 @@ const Puzzle = ({ puzzleNum, incrementPuzzleNum }) => {
       setPosition(chess.fen());
       moveIndexRef.current += 1;
       if (moveIndexRef.current === solution.length) {
-        setTimeout(() => incrementPuzzleNum(), 3000);
+        setTimeout(() => incrementPositionNum(), 3000);
         clearInterval(intervalIdRef.current); // Clear the interval
       }
     }
   };
 
   useEffect(() => {
-    fetchPuzzle();
-  }, [puzzleNum]);
+    fetchPosition(positionUrl);
+  }, [positionNum]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {
@@ -67,4 +68,4 @@ const Puzzle = ({ puzzleNum, incrementPuzzleNum }) => {
   );
 };
 
-export default Puzzle;
+export default Player;

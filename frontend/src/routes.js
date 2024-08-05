@@ -1,11 +1,11 @@
 import React from 'react';
 import { useRoutes } from 'react-router-dom';
-import PuzzlePlayerPage from './pages/PuzzlePlayerPage'; // Import the new page
+import PlayerPage from './pages/PlayerPage'; // Import the new page
 
 const AppRoutes = () => {
   const routes = [
-    { path: '/puzzle-player', element: <PuzzlePlayerPage /> }, // Add the new route
-    // Add other routes here as needed
+    { path: '/random-puzzles-player', element: <PlayerPage positionUrl='http://localhost:5000/api/puzzles/random' /> }, 
+    { path: '/random-games-player', element: <PlayerPage positionUrl='http://localhost:5000/api/games/random' /> }, 
   ];
 
   return useRoutes(routes);
