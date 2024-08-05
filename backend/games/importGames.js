@@ -29,9 +29,9 @@ console.log('Beginning import of ' + path);
 async function importGames(path) {
   try {
     const parsedPgns = await parsePgn(path);
-    const games = parsedPgns.map(parsedPgn => buildGame(parsedPgn)).filter(game => game !== null);
+    const games = parsedPgns.map(parsedPgn => buildGame(parsedPgn));
     console.log(`${games.length} games have been built`);
-    await Promise.all(games.map(game => game.save()));
+    await Promise.all(games.filter(game => game.Moves != '').map(game => game.save()));
     console.log('PGN file successfully processed and data imported');
   } catch (err) {
     console.error(`Error importing games: ${err.message}`);
@@ -40,16 +40,18 @@ async function importGames(path) {
 
 function buildGame(parsedPgn) {
   try {
+    console.log('Parsed PGN Data:', JSON.stringify(parsedPgn, null, 2));
+
     const headers = parsedPgn.headers;
 
-    return new Game({
+    const game = new Game({
       GameId: `game_${headers.White}_${headers.Black}_${headers.UTCDate}`,
       WhitePlayer: headers.White || '',
       BlackPlayer: headers.Black || '',
       Result: headers.Result || '',
       Date: headers.UTCDate || '',
       Opening: headers.Opening || '',
-      Moves: parsedPgn.moves.map(move => move.move).join(' '),
+      Moves: parsedPgn.moves.map(move => move.move).join(' ') || '',
       PGN: parsedPgn.raw || '',
       WhiteElo: headers.WhiteElo || '',
       BlackElo: headers.BlackElo || '',
@@ -59,6 +61,9 @@ function buildGame(parsedPgn) {
       TimeControl: headers.TimeControl || '',
       Termination: headers.Termination || ''
     });
+
+    console.log('game :', JSON.stringify(game, null, 2));
+    return game;
   } catch (error) {
     console.error('Failed to build game:', error);
   }
