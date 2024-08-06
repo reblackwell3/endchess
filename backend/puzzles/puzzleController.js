@@ -19,7 +19,7 @@ const getRandomPuzzle = async (req, res) => {
 // @desc    Get a random rated game
 // @route   GET /api/puzzles/random-rated/:rating
 // @access  Public
-const getRandomGameRated = async (req, res) => {
+const getRandomPuzzleRated = async (req, res) => {
   const rating = parseInt(req.params.rating, 10);
 
   try {
@@ -27,7 +27,7 @@ const getRandomGameRated = async (req, res) => {
       'Rating': { $gt: rating }
     });
     const randomIndex = Math.floor(Math.random() * count);
-    const game = await Game.findOne({
+    const game = await Puzzle.findOne({
       'Rating': { $gt: rating }
     }).skip(randomIndex);
     res.json(game);
@@ -76,6 +76,7 @@ const getPuzzleById = async (req, res) => {
 
 module.exports = {
   getRandomPuzzle,
+  getRandomPuzzleRated,
   getNextPuzzle,
   getPuzzleById,
 };
