@@ -32,7 +32,7 @@ const Player = ({ positionNum, incrementPositionNum, positionUrl }) => {
   const showNextMove = () => {
     if (moveIndexRef.current < solution.length) {
       const move = solution[moveIndexRef.current];
-      console.log('show next move = ' + move);
+      // console.log('show next move = ' + move);
       chess.move(move);
       setPosition(chess.fen());
       moveIndexRef.current += 1;
